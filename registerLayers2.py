@@ -3,11 +3,11 @@ from arcrest.ags import MapService
 
 if __name__ == "__main__":
     try:
-        #url = "{your server URL}"
-        url = "http://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer"
+        url = "{your server URL}"
+        #url = "http://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer"
 
-        username = "ScottMoorePNW"
-        password = "ChangeMeBack"
+        username = "{Your ArcGIS Online Username}"
+        password = "{Your ArcGIS Online Password}"
         sh = None
         agol = None
         usercontent = None
