@@ -3,9 +3,9 @@ from arcrest.ags import MapService
 
 if __name__ == "__main__":
     try:
-        url = "{your server URL}"
         #url = "http://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer"
-
+        url = "{URL to your Map or Feature Service}"
+        
         username = "{Your ArcGIS Online Username}"
         password = "{Your ArcGIS Online Password}"
         sh = None
@@ -19,6 +19,7 @@ if __name__ == "__main__":
         fs = MapService(url=url)
         for serviceLayer in fs.layers:
             if serviceLayer.type == "Feature Layer":
+                print "Adding: " + serviceLayer.name
                 if baseURL is None or baseURL == "":
                     baseURL = "https://www.arcgis.com/sharing/rest"
                 sh = arcrest.AGOLTokenSecurityHandler(username='ScottMoorePNW', password='ChangeMeBack')
@@ -29,7 +30,11 @@ if __name__ == "__main__":
 
                 #create an ArcPy Extent Object so we can reproject it to 4326 (lat/long)
                 layerExtent = arcpy.Extent(serviceLayer.extent.get('xmin'),serviceLayer.extent.get('ymin'),serviceLayer.extent.get('xmax'),serviceLayer.extent.get('ymax'))
-                layerExtent.spatialReference = arcpy.SpatialReference(serviceLayer.extent["spatialReference"]["wkid"])
+                try:
+                    layerExtent.spatialReference = arcpy.SpatialReference(serviceLayer.extent["spatialReference"]["wkid"])
+                except KeyError, e:
+                    print "WKT is not supported"
+                    break
 
                 #project the extent of the layer to 4326
                 layerExtentPrj = layerExtent.projectAs(arcpy.SpatialReference(4326))
@@ -46,9 +51,9 @@ if __name__ == "__main__":
                 itemParams.typeKeywords = ["Data", "Service", "Feature Service", "ArcGIS Server", "Feature Access"]
                 itemParams.extent = str(layerExtentPrj.XMin) + "," + str(layerExtentPrj.YMin) + "," + str(layerExtentPrj.XMax) + "," + str(layerExtentPrj.YMax)
                 res = usercontent.addItem(itemParameters=itemParams, overwrite=True, folder=folderId)
+                print res
             else:
                 print serviceLayer.name + " is not a valid type"
 
-        print res
     except ValueError, e:
         print e
